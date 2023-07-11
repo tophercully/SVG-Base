@@ -4,7 +4,10 @@ ratio = pageHeight/pageWidth //ratio is height/width of page to print on
 w= 1600
 h = w*ratio
 marg = w*randomVal(0.05, 0.2)
-wt = (0.01377953/pageHeight)*h
+
+mmSize = 0.35
+mmToInch = mmSize/25.4
+wt = (mmToInch/pageHeight)*h
 
 plotPal = ['#e95353', '#1d90fb', 'black']
 
@@ -19,6 +22,7 @@ function setup() {
 
 function draw() {
   background(bgc)
+  strokeWeight(wt)
 
   //Sketch
 
