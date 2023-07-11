@@ -127,17 +127,3 @@ function average(array) {
 }
 ////////////////////////////////////////
 
-function gradLUT() {
-  scl = 200
-  thisPal = [frameCol, truePal[0], truePal[1], frameCol]
-    for(let y = 0; y < h; y+=w/scl) {
-      nY = map(y, 0, h, 0, 1)
-      // colScale = chroma.scale(truePal.slice(0, numColors))//.classes(20)
-      colScale = chroma.scale(thisPal).padding([-0.8, 0.0])
-      hueCol = colScale(nY).hex()
-      col = hueCol
-      g.stroke(col)
-      g.strokeWeight(h/scl)
-      g.line(0, y, w,y)
-    }
-}
