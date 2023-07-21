@@ -1,15 +1,22 @@
-pageHeight = 8
 pageWidth = 6
+pageHeight = 8
 ratio = pageHeight/pageWidth //ratio is height/width of page to print on
 w= 1600
 h = w*ratio
-marg = w*randomVal(0.05, 0.2)
+marg = (inchToPx(1))
 
 mmSize = 0.35
 mmToInch = mmSize/25.4
-wt = (mmToInch/pageHeight)*h
+mmWt = (mmToInch/pageHeight)*h
 
-plotPal = ['#e95353', '#1d90fb', 'black']
+plotPal = [
+  '#d64926', //scarlett
+  '#2368c2', //rowney blue
+  '#144722', //sap green
+  '#60c365', //emerald
+  '#FEEB23', //fprocess yellow
+  'black'
+]
 
 //parameters
 
