@@ -29,7 +29,7 @@ function setup() {
 
 function draw() {
   background(bgc)
-  strokeWeight(wt)
+  strokeWeight(mmWt)
 
   //Sketch
 
