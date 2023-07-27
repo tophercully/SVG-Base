@@ -32,7 +32,7 @@ function setLineDash(list) {
 
 function keyTyped() {
   if (key === "s" || key === "S") {
-    save("TEMPEST"+fxhash);
+    save(pageWidth+'x'+pageHeight+fxhash);
   }
   if (key === "1") {
     window.history.replaceState('', '', updateURLParameter(window.location.href, "size", "1"));
@@ -44,6 +44,18 @@ function keyTyped() {
   }
   if (key === "3") {
     window.history.replaceState('', '', updateURLParameter(window.location.href, "size", "3"));
+    window.location.reload();
+  }
+  if (key === "v" || key === "V") {
+    window.history.replaceState('', '', updateURLParameter(window.location.href, "renderType", "2"));
+    window.location.reload();
+  }
+  if (key === "p" || key === "P") {
+    window.history.replaceState('', '', updateURLParameter(window.location.href, "renderType", "1"));
+    window.location.reload();
+  }
+  if (key === "w" || key === "W") {
+    window.history.replaceState('', '', updateURLParameter(window.location.href, "penSize", "35"));
     window.location.reload();
   }
 }
@@ -90,6 +102,61 @@ function updateURLParameter(url, param, paramVal)
 
     var rows_txt = temp + "" + param + "=" + paramVal;
     return baseURL + "?" + newAdditionalURL + rows_txt;
+}
+
+function reOrder() {
+  //find all paths
+
+  mainSVG = document.getElementsByTagName('svg')
+  paths = document.getElementsByTagName('path')
+
+  onlyG = document.getElementsByTagName("g")
+  //find folder paths are currently under
+  pathsFolder = paths[0].parentElement
+  folder = onlyG[0].parentElement
+  folder.setAttribute('xlmns', 'inkscape', '')
+  
+  folder.setAttribute('xlmns:inkscape', 'https://inkscape.org/namespaces/inkscape/')
+  layers = []
+  
+  //check against first color
+  for(let j = 0; j < plotPal.length; j++) {
+    layers[j] = document.createElement('g')
+    layers[j].setAttribute('id', 'layer'+(j+1))
+    // layers[j].setAttribute('inkScape', 'groupmode')
+    layers[j].setAttribute('inkscape:groupmode', 'layer')
+    layers[j].setAttribute('inkscape:label', plotPal[j].svgName)
+    // console.log(layers[j])
+    console.log(paths.length)
+    //call and format color for comparison
+    palCol = color(plotPal[j].hex)
+    palColFormatted = "rgb("+palCol.levels[0]+','+palCol.levels[1]+','+palCol.levels[2]+')'
+    
+    //check against each path
+    for(let i = 0; i < paths.length; i++) {
+      //read path color
+      col = paths[i].getAttribute("stroke")//Path color
+      
+      console.log(col, 'sample')
+      console.log(palColFormatted, 'target')
+      //sort colors into respective groups
+      if(col == palColFormatted) {
+        console.log('sorting')
+        layers[j].append(paths[i])
+        
+        
+      }
+      
+    }
+    
+  }
+
+  for(let i = 0; i < layers.length; i++) {
+    folder.append(layers[i])
+    console.log(folder)
+  }
+  
+  
 }
 
 function randColor() {
@@ -170,6 +237,12 @@ function setStrokeMM(mm) {
   weightNow = mmToPx(mm) 
   strokeWeight(weightNow)
 }
+
+function setPen(pen) {
+  stroke(pen.hex)
+  mmWt = mmToPx(pen.sz)
+  strokeWeight(mmWt)
+}
 ////////////////////////////////////////
 
 function dashLine(xA, yA, xB, yB, phase) {
@@ -227,7 +300,7 @@ function wiggleLine(xA, yA, xB, yB, weight) {
 function dashWiggleLine(xA, yA, xB, yB, weight) {
   noFill()
   strokeWeight(mmWt)
-  startAng = 180//randomVal(0, 360)
+  startAng = randomVal(0, 360)
   here = createVector(xA, yA)
   there = createVector(xB, yB)
   length = distBetween(here.x, here.y, there.x, there.y)
@@ -239,7 +312,7 @@ function dashWiggleLine(xA, yA, xB, yB, weight) {
   inc = length/(dashFreq/2)
   drawing = false
   numCounter = 0
-  for(let i = 0; i < length; i+=mmWt) {
+  for(let i = 0; i < length; i+=mmWt/2) {
     numCounter++
     iNormal = map(i, 0, length, 0, 360)
     n = sin(iNormal*dashFreq)//noise(i*ns, phase)
@@ -276,5 +349,25 @@ function compoundDash(xA, yA, xB, yB, weight, num) {
     offMax = (weight-thisWt)/2
     off = ptFromAng(0, 0, ang+90, randomVal(offMax, -offMax))
     dashWiggleLine(xA+off.x, yA+off.y, xB+off.x, yB+off.y, thisWt)
+  }
+}
+
+function noiseGrid(cols, phase) {
+  // cols = randomInt(5, 50)
+  rows = Math.round(cols*ratio)
+  cellW = (w-(marg*2))/cols
+  cellH = (h-(marg*2))/rows
+  padding = min([cellW, cellH])*0.2
+  ns = 4
+
+  for(let y = 0; y < rows; y++) {
+    for(let x = 0; x < cols; x++) {
+      xNormal = map(x, 0, cols, 0, 1)
+      yNormal = map(y, 0, rows, 0, 1)
+      n = noise(xNormal*ns, yNormal*ns, phase)
+      if(n > 0.5) {
+        circle(marg+x*cellW+cellW/2, marg+y*cellH+cellH/2, min([cellW, cellH])-padding)
+      }
+    }
   }
 }
